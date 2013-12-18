@@ -35,15 +35,29 @@ char digitToHex(BMPImage::byte digit) {
         throw runtime_error("Digit must be in range [0..15]");
     }
     if (digit < 10) return digit + '0';
-    return digit - 10 + 'A';
+    return digit - 10 + 'a';
 }
 
 string toHex(BMPImage::byte value) {
     return string() + digitToHex(value >> 4) + digitToHex(value & 15);
 }
 
-void outputHex(const BMPImage::bytes& data) {
-     
+string dumpToHex(const BMPImage::bytes& data) {
+    stringstream ss;
+    for (size_t i = 0; i < data.size(); ++i) {
+        ss << toHex(data[i]);
+        if (i + 1 == data.size()) break;
+
+        if ((i & 15) == 15) {
+            ss << '\n';
+        } else if ((i & 7) == 7) {
+            ss << " | ";
+        } else if ((i & 1) == 1) {
+            ss << ' ';
+        }
+    }
+    ss << endl;
+    return ss.str();
 }
 
 }

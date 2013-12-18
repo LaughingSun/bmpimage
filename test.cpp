@@ -11,7 +11,7 @@ using namespace std;
 class DigitToHexTest : public NTest::Test {
 public:
     virtual void test() {
-        const char anses[] = "0123456789ABCDEF";
+        const char anses[] = "0123456789abcdef";
         for (int i = 0; i < 16; ++i) {
             char ans = NImage::digitToHex(i);
             stringstream ss;
@@ -40,11 +40,36 @@ public:
         }
     }
 };
+class DumpToHexTest: public NTest::Test {
+public:
+    virtual void test() {
+        NImage::BMPImage::bytes data;
+        for (int i = 0; i < 16; ++i) {
+            data.push_back(i);
+        }
+        NTest::checkEqual(NImage::dumpToHex(data), "0001 0203 0405 0607 | 0809 0a0b 0c0d 0e0f\n");
+
+        data.clear();
+        for (int i = 0; i < 40; ++i) data.push_back(255);
+        
+        NTest::checkEqual(NImage::dumpToHex(data), "ffff ffff ffff ffff | ffff ffff ffff ffff\n"
+                                                   "ffff ffff ffff ffff | ffff ffff ffff ffff\n"
+                                                   "ffff ffff ffff ffff\n");
+
+        data.clear();
+        data.push_back(13);
+        NTest::checkEqual(NImage::dumpToHex(data), "0d\n");
+        data.push_back(48);
+        NTest::checkEqual(NImage::dumpToHex(data), "0d30\n");
+        data.push_back(255);
+        NTest::checkEqual(NImage::dumpToHex(data), "0d30 ff\n");
+    }
+};
 class ToHexTest: public NTest::Test {
 public:
     virtual void test() {
-        NTest::checkEqual(NImage::toHex(10), "0A"); 
-        NTest::checkEqual(NImage::toHex(255), "FF"); 
+        NTest::checkEqual(NImage::toHex(10), "0a"); 
+        NTest::checkEqual(NImage::toHex(255), "ff"); 
         NTest::checkEqual(NImage::toHex(0), "00"); 
         NTest::checkEqual(NImage::toHex(16), "10"); 
     }
@@ -54,6 +79,7 @@ int main() {
     NTest::TestEnvironment::test(new DigitToHexTest);
     NTest::TestEnvironment::test(new DigitToHexNegativeTest);
     NTest::TestEnvironment::test(new ToHexTest);
+    NTest::TestEnvironment::test(new DumpToHexTest);
 
     return 0;
 }
