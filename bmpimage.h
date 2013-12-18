@@ -24,12 +24,10 @@ private:
 public:
     BMPImage(const string& filename);
     BMPImage(const bytes& data);
-
-    
 };
 
 BMPImage::bytes readBytesFromFile(const string& filename) {  
-     
+         
 }
 
 char digitToHex(BMPImage::byte digit) {
@@ -41,11 +39,11 @@ char digitToHex(BMPImage::byte digit) {
 }
 
 string toHex(BMPImage::byte value) {
-    return string() + digitToHex(value >> 8) + digitToHex(value & 63);
+    return string() + digitToHex(value >> 4) + digitToHex(value & 15);
 }
 
 void outputHex(const BMPImage::bytes& data) {
-    
+     
 }
 
 }
