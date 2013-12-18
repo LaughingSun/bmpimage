@@ -74,12 +74,20 @@ public:
         NTest::checkEqual(NImage::toHex(16), "10"); 
     }
 };
+class ReadBytesFromFileTest: public NTest::Test {
+public:
+    virtual void test() {  
+        NImage::BMPImage::bytes result = NImage::readBytesFromFile("test_files/read_bytes.txt");
+        NTest::checkEqual("6162 6163 6162 610a | 0a\n", NImage::dumpToHex(result), "method readBytesFromFile doesn't work for file test_files/read_bytes.txt");
+    }
+};
 
 int main() {
     NTest::TestEnvironment::test(new DigitToHexTest);
     NTest::TestEnvironment::test(new DigitToHexNegativeTest);
     NTest::TestEnvironment::test(new ToHexTest);
     NTest::TestEnvironment::test(new DumpToHexTest);
+    NTest::TestEnvironment::test(new ReadBytesFromFileTest);
 
     return 0;
 }

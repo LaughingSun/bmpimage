@@ -1,10 +1,12 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <fstream>
 
 using std::string;
 using std::vector;
 using std::runtime_error;
+using std::ifstream;
 
 namespace NImage {
 
@@ -27,7 +29,19 @@ public:
 };
 
 BMPImage::bytes readBytesFromFile(const string& filename) {  
-         
+    const size_t BUFFER_SIZE = 1024;
+    char buffer[BUFFER_SIZE]; 
+    ifstream in(filename.c_str(), ios::in | ios::binary);
+    
+    BMPImage::bytes result;
+    in.read(buffer, BUFFER_SIZE);
+    while (in) {
+        result.insert(result.end(), buffer, buffer + BUFFER_SIZE);
+        in.read(buffer, BUFFER_SIZE);
+    }
+    result.insert(result.end(), buffer, buffer + in.gcount());
+
+    return result;
 }
 
 char digitToHex(BMPImage::byte digit) {
