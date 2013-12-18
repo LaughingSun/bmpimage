@@ -2,11 +2,15 @@
 #include <vector>
 #include <stdexcept>
 #include <fstream>
+#include <sstream>
 
 using std::string;
+using std::endl;
 using std::vector;
 using std::runtime_error;
 using std::ifstream;
+using std::ios;
+using std::stringstream;
 
 namespace NImage {
 
