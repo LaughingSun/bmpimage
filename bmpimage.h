@@ -41,7 +41,7 @@ char digitToHex(BMPImage::byte digit) {
 }
 
 string toHex(BMPImage::byte value) {
-
+    return string() + digitToHex(value >> 8) + digitToHex(value & 63);
 }
 
 void outputHex(const BMPImage::bytes& data) {

@@ -25,17 +25,20 @@ namespace NTest {
     STATUS_CODE status = OK;
     vector<string> errorMessages;
 
+    void error(const string& message) {
+        status = ERROR;
+        errorMessages.push_back(message);
+    }
+
     void checkTrue(bool condition, const string& message) {
         if (!condition) {
-            status = ERROR;
-            errorMessages.push_back(message);
+            error(message);
         }
     }
 
     template<typename T>
     void checkEqual(const T& a, const T& b, const string& message) {
         checkTrue(a == b, message);
-
     }
 
     template<typename T>
@@ -49,6 +52,18 @@ namespace NTest {
         checkTrue(condition, "Condition is not hold");
     }
 
+    void checkEqual(const string& a, const char* b) {
+        checkEqual(a, string(b));
+    }
+    void checkEqual(const char* a, const string& b) {
+        checkEqual(string(a), b);
+    }
+    void checkEqual(const string& a, const char* b, const string& message) {
+        checkEqual(a, string(b), message);
+    }
+    void checkEqual(const char* a, const string& b, const string& message) {
+        checkEqual(string(a), b, message);
+    }
 
     class Test {
     public:
@@ -74,7 +89,11 @@ namespace NTest {
             cout << "Test #" << testNo << "\t";
 
             test->setUp();
-            test->test();
+            try {
+                test->test();
+            } catch (...) {
+                error("Exception has been caugth"); 
+            }
             test->tearDown();
            
             if (status == OK) {
