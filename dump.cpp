@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "bmpimage.h"
+#include "bytes.h"
 
 using namespace std;
 

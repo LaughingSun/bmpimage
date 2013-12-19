@@ -4,7 +4,7 @@
 
 #include "test.h"
 
-#include "bmpimage.h"
+#include "bytes.h"
 
 using namespace std;
 
@@ -43,7 +43,7 @@ public:
 class DumpToHexTest: public NTest::Test {
 public:
     virtual void test() {
-        NImage::BMPImage::bytes data;
+        NImage::bytes data;
         for (int i = 0; i < 16; ++i) {
             data.push_back(i);
         }
@@ -77,7 +77,7 @@ public:
 class ReadBytesFromFileTest: public NTest::Test {
 public:
     virtual void test() {  
-        NImage::BMPImage::bytes result = NImage::readBytesFromFile("test_files/read_bytes.txt");
+        NImage::bytes result = NImage::readBytesFromFile("test_files/read_bytes.txt");
         NTest::checkEqual("6162 6163 6162 610a | 0a\n", NImage::dumpToHex(result), "method readBytesFromFile doesn't work for file test_files/read_bytes.txt");
     }
 };
