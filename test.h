@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -16,18 +18,26 @@ namespace NTest {
     #define KRED  "\x1B[31m"
     #define KGRN  "\x1B[32m"
 #endif
-#define COLORED(txt, color) color txt KNRM
+
+    string colored(const string& txt, const string& color) {
+        stringstream ss;
+        ss << color << txt << KNRM;
+        return ss.str();
+    }
 
     enum STATUS_CODE {
         OK = 0,
         ERROR = 1
     };
     STATUS_CODE status = OK;
-    vector<string> errorMessages;
+
+    void log(const string& message) {
+        cout << colored("\t" + message, KGRN) << endl;
+    }
 
     void error(const string& message) {
         status = ERROR;
-        errorMessages.push_back(message);
+        cout << colored("\t" + message, KRED) << endl; 
     }
 
     void checkTrue(bool condition, const string& message) {
@@ -70,6 +80,7 @@ namespace NTest {
         virtual void setUp() {};
         virtual void test() = 0;
         virtual void tearDown() {};
+        virtual string getName() {return "Unnamed test";}
 
         virtual ~Test() {};
     };
@@ -77,40 +88,103 @@ namespace NTest {
     class TestEnvironment {
     private:
         static size_t testNo;
+        static vector< Test* > tests;
 
-    public:
         static bool test(Test* test) {
-            if (status != OK) {
-                cerr << "Test already failed!" << endl;
-                return false;
-            }
-
-            ++testNo;
-            cout << "Test #" << testNo << "\t";
+            status = OK;
 
             test->setUp();
             try {
                 test->test();
+            } catch (const exception& e) {
+                error("Exception has been caught");
+                error(string("\t") + e.what()); 
             } catch (...) {
                 error("Exception has been caugth"); 
             }
             test->tearDown();
            
             if (status == OK) {
-                cout << COLORED("PASSED", KGRN) << endl;
                 return true;
             }
 
-            cout << COLORED("FAILED", KRED) << endl;
-            for (size_t i = 0; i < errorMessages.size(); ++i) {
-                cout << "\t" << errorMessages[i] << endl;
-            }
-            errorMessages.clear();
-            exit(1);
             return false;
         }
+
+        static string getAligned(const string& message, int width) {
+            string result = message;
+            while (result.size() < width) {
+                result += ' ';
+            }
+            return result;
+        }
+
+        static string getXeroxed(string pattern, int times) {
+            string result;
+            while (times--) {
+                result += pattern;
+            }
+            return result;
+        }
+    public:
+        static void addTest(Test* test) {
+            tests.push_back(test); 
+        }
+
+        static void run() {
+            size_t all = tests.size();
+            size_t passed = 0;
+
+            vector<bool> isPassed(tests.size());
+            for (size_t i = 0; i < tests.size(); ++i) {
+                cout << "Running test #" << i + 1 << " (" << tests[i]->getName() << ")" << endl;
+                isPassed[i] = test(tests[i]);
+                if (isPassed[i]) {
+                    ++passed;
+                    cout << colored("Test is passed\n", KGRN);
+                } else {
+                    cout << colored("Test is failed\n", KRED);
+                }
+            }
+
+            const int NUMBER_WIDTH = 5;
+            const int NAME_WIDTH = 40;
+            const int RESULT_WIDTH = 10;
+            const int ROW_WIDTH = NUMBER_WIDTH + NAME_WIDTH + RESULT_WIDTH + 7; // two seprators
+
+            cout << "\n\n\n";
+            cout << getXeroxed("-", ROW_WIDTH) << endl;
+            cout << getAligned("| #", NUMBER_WIDTH) << " | ";
+            cout << getAligned("name", NAME_WIDTH) << " | ";
+            cout << getAligned("result", RESULT_WIDTH) << "|\n";
+            cout << getXeroxed("-", ROW_WIDTH) << endl;
+
+            for (int i = 0; i < tests.size(); ++i) {
+                stringstream ss;
+                ss << "| " << i;
+                cout << getAligned(ss.str(), NUMBER_WIDTH) << " | ";
+                cout << getAligned(tests[i]->getName(), NAME_WIDTH) << " | ";
+                if (isPassed[i]) {
+                    cout << colored(getAligned("PASSED", RESULT_WIDTH), KGRN) << "|" << endl;
+                } else {
+                    cout << colored(getAligned("FAILED", RESULT_WIDTH), KRED) << "|" << endl;
+                }
+            }
+            cout << getXeroxed("-", ROW_WIDTH) << endl << endl;
+
+            if (all == passed) {
+                cout << colored("All tests passed", KGRN) << endl;
+            } else {
+                stringstream ss;
+                ss << (all - passed) << " out of " << all << " tests failed";
+                cout << colored(ss.str(), KRED) << endl;
+            }
+        }
+
+        
     };
     size_t TestEnvironment::testNo = 0;
+    vector<Test*> TestEnvironment::tests = vector<Test*>();
     
     
 #undef COLORED

@@ -1,16 +1,18 @@
-#include <string>
-#include <vector>
+#pragma once
+
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
-using std::vector;
-using std::string;
-using std::ifstream;
 using std::endl;
-using std::runtime_error;
+using std::ifstream;
 using std::ios;
+using std::runtime_error;
+using std::string;
 using std::stringstream;
+using std::vector;
 
 
 namespace NImage {

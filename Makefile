@@ -1,5 +1,5 @@
 test: bmpimage.h test.h test.cpp
-	g++ -O2 test.cpp -o test
+	g++  -O2 test.cpp -o test
 	./test
 
 dump: dump.cpp bmpimage.h
