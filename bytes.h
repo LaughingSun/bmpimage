@@ -18,6 +18,7 @@ using std::vector;
 namespace NImage {
     typedef unsigned char byte;
     typedef vector<byte> bytes;
+    typedef unsigned int uint;
 
     bytes readBytesFromFile(const string& filename) {  
         const size_t BUFFER_SIZE = 1024;
@@ -63,5 +64,16 @@ namespace NImage {
         }
         ss << endl;
         return ss.str();
+    }
+
+    uint uintFromBytes(const bytes& data) {
+        if (data.size() > 4) {
+            throw runtime_error("uint can't store more than 4 bytes");
+        }
+        uint result = 0;
+        for (int i = int(data.size()) - 1; i >= 0; --i) {
+            result = (result << 8) + data[i]; 
+        }
+        return result;
     }
 }

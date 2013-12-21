@@ -92,7 +92,31 @@ class ReadBytesFromFileTest: public NTest::Test {
             NTest::checkEqual("6162 6163 6162 610a | 0a\n", NImage::dumpToHex(result), "method readBytesFromFile doesn't work for file test_files/read_bytes.txt");
         }
 };
+class UintFromBytesTest: public NTest::Test {
+    public:
+        virtual string getName() {return "uintFromBytes(const bytes&) test";}
 
+        virtual void test() {
+            NImage::bytes data;
+            NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(0), "uint from {} must be equal to zero");
+            data.push_back(1);
+            NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(1), "uint from {1} must be equal to 1");
+            data.push_back(2);
+            NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(513), "uint from {1, 2} must be equal to 513");
+
+            data.push_back(3);
+            NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(197121), "uint from {1, 2, 3} must be equal to 197121");
+            data.push_back(3);
+            NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(50528769), "uint from {1, 2, 3} must be equal to 50528769");
+            data.push_back(3);
+            
+            try {
+                NImage::uintFromBytes(data); 
+            } catch (const runtime_error& e) {
+                NTest::log("Too big bytes array test passed"); 
+            }
+        }
+};
 class BMPImageTest: public NTest::Test {
     public:
         virtual string getName() {return "BMPImage class test";}
@@ -113,6 +137,7 @@ int main() {
     NTest::TestEnvironment::addTest(new DumpToHexTest);
     NTest::TestEnvironment::addTest(new ReadBytesFromFileTest);
     NTest::TestEnvironment::addTest(new BMPImageTest);
+    NTest::TestEnvironment::addTest(new UintFromBytesTest);
 
     NTest::TestEnvironment::run();
 
