@@ -6,5 +6,5 @@ dump: dump.cpp bmpimage.h
 	g++ -O2 dump.cpp -o dump 
 
 clean:
-	rm -rf test dump
+	rm -rf test dump *\.gch
 
