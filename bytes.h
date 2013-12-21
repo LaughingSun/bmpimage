@@ -76,4 +76,8 @@ namespace NImage {
         }
         return result;
     }
+
+    uint uintFromBytes(bytes::const_iterator begin, bytes::const_iterator end) {
+        return uintFromBytes(bytes(begin, end));
+    }
 }

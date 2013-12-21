@@ -99,19 +99,29 @@ class UintFromBytesTest: public NTest::Test {
         virtual void test() {
             NImage::bytes data;
             NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(0), "uint from {} must be equal to zero");
+            NTest::checkEqual(NImage::uintFromBytes(data.begin(), data.end()), NImage::uint(0), "uint from {} must be equal to zero");
             data.push_back(1);
             NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(1), "uint from {1} must be equal to 1");
+            NTest::checkEqual(NImage::uintFromBytes(data.begin(), data.end()), NImage::uint(1), "uint from {1} must be equal to 1");
             data.push_back(2);
             NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(513), "uint from {1, 2} must be equal to 513");
+            NTest::checkEqual(NImage::uintFromBytes(data.begin(), data.end()), NImage::uint(513), "uint from {1, 2} must be equal to 513");
 
             data.push_back(3);
             NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(197121), "uint from {1, 2, 3} must be equal to 197121");
+            NTest::checkEqual(NImage::uintFromBytes(data.begin(), data.end()), NImage::uint(197121), "uint from {1, 2, 3} must be equal to 197121");
             data.push_back(3);
-            NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(50528769), "uint from {1, 2, 3} must be equal to 50528769");
+            NTest::checkEqual(NImage::uintFromBytes(data), NImage::uint(50528769), "uint from {1, 2, 3, 3} must be equal to 50528769");
+            NTest::checkEqual(NImage::uintFromBytes(data.begin(), data.end()), NImage::uint(50528769), "uint from {1, 2, 3, 3} must be equal to 50528769");
             data.push_back(3);
             
             try {
                 NImage::uintFromBytes(data); 
+            } catch (const runtime_error& e) {
+                NTest::log("Too big bytes array test passed"); 
+            }
+            try {
+                NImage::uintFromBytes(data.begin(), data.end()); 
             } catch (const runtime_error& e) {
                 NTest::log("Too big bytes array test passed"); 
             }
