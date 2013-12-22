@@ -118,12 +118,12 @@ class UintFromBytesTest: public NTest::Test {
             try {
                 NImage::uintFromBytes(data); 
             } catch (const runtime_error& e) {
-                NTest::log("Too big bytes array test passed"); 
+                NTest::log("Too big bytes array test passed (vector)"); 
             }
             try {
                 NImage::uintFromBytes(data.begin(), data.end()); 
             } catch (const runtime_error& e) {
-                NTest::log("Too big bytes array test passed"); 
+                NTest::log("Too big bytes array test passed (iterators)"); 
             }
         }
 };
@@ -132,11 +132,32 @@ class BMPImageTest: public NTest::Test {
         virtual string getName() {return "BMPImage class test";}
 
         virtual void test() {
+            using NImage::uint;
+
             try {
                 NImage::BMPImage image("test_files/8-8-8_false_signature.bmp"); 
             } catch (const runtime_error& e) {
                 NTest::log("False signature test passed");
             }
+
+            NImage::BMPImage image("test_files/8-8-8.bmp");
+            NTest::checkEqual(image.getOffsetToData(), uint(70), "getOffsetToData() test is failed");
+            NTest::checkEqual(image.getImageHeaderSize(), uint(40), "getImageHeaderSize() test is failed");
+            NTest::checkEqual(image.getCompressionType(), uint(0), "getCompressionType() test is failed");
+            NTest::checkEqual(image.getHeight(), uint(3), "getHeight() test is failed");
+            NTest::checkEqual(image.getWidth(), uint(3), "getWidth() test is failed");
+            NTest::checkEqual(image.getBitsPerPixel(), uint(8), "getBitsPerPixel() test is failed");
+            
+            NImage::BMPImage image2("test_files/X8-8-8-8.bmp");
+            NTest::checkEqual(image2.getOffsetToData(), uint(70), "getOffsetToData() test is failed");
+            NTest::checkEqual(image2.getImageHeaderSize(), uint(56), "getImageHeaderSize() test is failed");
+            NTest::checkEqual(image2.getCompressionType(), uint(3), "getCompressionType() test is failed");
+            NTest::checkEqual(image2.getHeight(), uint(2), "getHeight() test is failed");
+            NTest::checkEqual(image2.getWidth(), uint(2), "getWidth() test is failed");
+            NTest::checkEqual(image2.getBitsPerPixel(), uint(32), "getBitsPerPixel() test is failed");
+            NTest::checkEqual(image2.getRedMask(), uint(4278190080), "getRedMask() test is failed");
+            NTest::checkEqual(image2.getGreenMask(), uint(16711680), "getGreenMask() test is failed");
+            NTest::checkEqual(image2.getBlueMask(), uint(65280), "getBlueMask() test is failed");
         }
 };
 

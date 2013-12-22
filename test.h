@@ -39,27 +39,42 @@ namespace NTest {
         status = ERROR;
         cout << colored("\t" + message, KRED) << endl; 
     }
+    void error() {
+        status = ERROR;
+    }
 
-    void checkTrue(bool condition, const string& message) {
+    bool checkTrue(bool condition, const string& message) {
         if (!condition) {
             error(message);
         }
+        return condition;
+    }
+    bool checkTrue(bool condition) {
+        if (!condition) {
+            error();
+        }
+        return condition;
+    }
+
+    template<typename T, typename W>
+    string getInequalityMessage(const T& a, const W& b) {
+        stringstream ss;
+        ss << a << " != " << b;
+        return ss.str();
     }
 
     template<typename T>
     void checkEqual(const T& a, const T& b, const string& message) {
-        checkTrue(a == b, message);
+        if (!checkTrue(a == b, message)) {
+            error(getInequalityMessage(a, b));
+        }
     }
 
     template<typename T>
     void checkEqual(const T& a, const T& b) {
-        stringstream ss;
-        ss << a << " is not equal to " << b;
-        checkEqual(a, b, ss.str());
-    }
-
-    void checkTrue(bool condition) {
-        checkTrue(condition, "Condition is not hold");
+        if (!checkTrue(a == b)) {
+            error(getInequalityMessage(a, b));
+        }
     }
 
     void checkEqual(const string& a, const char* b) {
