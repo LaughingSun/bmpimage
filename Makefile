@@ -1,3 +1,5 @@
+all: dump lsb test
+
 test: bmpimage.h test.h test.cpp lsb_encoder.h
 	g++  -O2 test.cpp -o binaries/test
 	./binaries/test
