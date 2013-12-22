@@ -46,7 +46,17 @@ namespace NImage {
             bytes getImageData() const;
 
             void setImageData(const bytes& newImageData);
+            bytes getFullData() const;
     };
+
+    bytes BMPImage::getFullData() const {
+        bytes result;
+        result.insert(result.end(), fileHeader.begin(), fileHeader.end());
+        result.insert(result.end(), imageHeader.begin(), imageHeader.end());
+        result.insert(result.end(), pallete.begin(), pallete.end());
+        result.insert(result.end(), imageData.begin(), imageData.end());
+        return result;
+    }
 
     void BMPImage::clear() {
         fileHeader.clear();         
@@ -149,6 +159,7 @@ namespace NImage {
         
         uint imageHeaderSize = uintFromBytes(data.begin() + FILE_HEADER_SIZE, data.begin() + FILE_HEADER_SIZE + IMAGE_HEADER_SIZE_SIZE);
         imageHeader.insert(imageHeader.end(), data.begin() + FILE_HEADER_SIZE, data.begin() + FILE_HEADER_SIZE + imageHeaderSize);
+        pallete.insert(pallete.end(), data.begin() + FILE_HEADER_SIZE + imageHeaderSize, data.begin() + offsetToData);
 
         parseImageHeader();
 

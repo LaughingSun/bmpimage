@@ -5,15 +5,19 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <algorithm>
+
 
 using std::endl;
+using std::min;
 using std::ifstream;
 using std::ios;
+using std::ostream;
+using std::ofstream;
 using std::runtime_error;
 using std::string;
 using std::stringstream;
 using std::vector;
-
 
 namespace NImage {
     typedef unsigned char byte;
@@ -34,6 +38,23 @@ namespace NImage {
         result.insert(result.end(), buffer, buffer + in.gcount());
 
         return result;
+    }
+
+    void writeBytesToFile(const string& filename, const bytes& data) {
+        const size_t BUFFER_SIZE = 1024;
+        char buffer[BUFFER_SIZE];
+        ofstream out(filename.c_str(), ios::out | ios::binary);
+        
+        size_t written = 0;
+        while (written < data.size()) {
+            size_t lim = min(BUFFER_SIZE, data.size() - written);
+            for (size_t i = 0; i < lim; ++i) {
+                buffer[i] = data[written++];
+            }
+
+            out.write(buffer, lim);
+        }
+        out.close();
     }
 
     char digitToHex(byte digit) {
@@ -75,6 +96,14 @@ namespace NImage {
             result = (result << 8) + data[i]; 
         }
         return result;
+    }
+
+    void bytesFromUint(bytes::iterator begin, bytes::iterator end, uint value) {
+        while (begin < end) {
+            *begin = value & 255;
+            value >>= 8;
+            ++begin;
+        }
     }
 
     uint uintFromBytes(bytes::const_iterator begin, bytes::const_iterator end) {

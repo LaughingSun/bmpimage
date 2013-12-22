@@ -6,6 +6,8 @@
 
 #include "bytes.h"
 #include "bmpimage.h"
+#include "lsb_encoder.h"
+#include "lsb_decoder.h"
 
 using namespace std;
 
@@ -158,6 +160,122 @@ class BMPImageTest: public NTest::Test {
             NTest::checkEqual(image2.getRedMask(), uint(4278190080), "getRedMask() test is failed");
             NTest::checkEqual(image2.getGreenMask(), uint(16711680), "getGreenMask() test is failed");
             NTest::checkEqual(image2.getBlueMask(), uint(65280), "getBlueMask() test is failed");
+
+            NImage::bytes data1 = NImage::readBytesFromFile("test_files/8-8-8.bmp");
+            NTest::checkEqual(data1, image.getFullData(), "getFullData() test is failed");
+            NImage::bytes data2 = NImage::readBytesFromFile("test_files/X8-8-8-8.bmp");
+            NTest::checkEqual(data2, image2.getFullData(), "getFullData() test is failed");
+        }
+};
+class LSBEncoderTest: public NTest::Test {
+    private:
+        bool checkOk(string encoded, string decoded) {
+            while (encoded.size() < decoded.size()) {
+                encoded += '0';
+            }
+            return NTest::checkEqual(encoded, decoded, "Encoded and decoded message are not the same");
+        }
+
+    public:
+        virtual string getName() {return "LSBEncoderTest class test";}
+
+        virtual void test() {
+            using NImage::uint;
+            using NTest::checkEqual;
+
+            vector<string> files;
+            vector<uint> messageLengths;
+            vector<string> message;
+
+            files.push_back("test_files/8-8-8.bmp");
+            messageLengths.push_back(0);
+            message.push_back("");
+
+            files.push_back("test_files/X8-8-8-8.bmp");
+            messageLengths.push_back(12);
+            message.push_back("00000000");
+
+            files.push_back("test_files/X8-8-8-8.bmp");
+            messageLengths.push_back(12);
+            message.push_back("10110111");
+
+            for (size_t i = 0; i < files.size(); ++i) {
+                string encodedFile = files[i] + "_encoded.bmp";
+                NImage::LSBEncoder encoder(files[i]);
+                encoder.encodeBitMessage(message[i]);
+                encoder.writeMessageToFile(encodedFile);
+                NImage::LSBDecoder decoder(encodedFile);
+
+                checkEqual(encoder.getMaximumLength(), messageLengths[i]);
+                checkOk(message[i], decoder.decodeBitMessage());
+            }
+        }
+};
+class BytesFromUintTest: public NTest::Test {
+    public:
+        virtual string getName() {return "BytesFromUint method test";}
+
+        virtual void test() {
+            using NImage::uint;
+            using NTest::checkEqual;
+            using NImage::bytes;
+            using NImage::uintFromBytes;
+            using NImage::bytesFromUint;
+            
+            bytes data;
+            for (size_t i = 0; i < 10; ++i) {
+                data.push_back(i);
+            }
+            bytes arena = data;
+
+            for (size_t i = 0; i < data.size(); ++i)
+                for (size_t j = i; j < data.size(); ++j) {
+                    if (j - i > 4) break;
+
+                    uint val = uintFromBytes(data.begin() + i, data.begin() + j);
+                    bytesFromUint(arena.begin() + i, arena.begin() + j, val); 
+
+                    stringstream ss;
+                    ss << "bytesFromUint test from " << i << "th to " << j << "th test is failed"; 
+                    checkEqual(bytes(data.begin() + i, data.begin() + j), bytes(arena.begin() + i, arena.begin() + j), ss.str());
+                }
+        }
+};
+class WriteBytesToFileTest: public NTest::Test {
+    public:
+        virtual string getName() {return "WriteBytesToFileTest method test";}
+
+        virtual void test() {
+            using NImage::bytes;
+            using NImage::uint;
+            using NTest::checkEqual;
+            using NImage::readBytesFromFile;
+            using NImage::writeBytesToFile;
+            using NTest::log;
+            
+            vector<string> files;
+            files.push_back("test_files/read_bytes.txt");
+            files.push_back("test_files/X8-8-8-8.bmp");
+            files.push_back("test_files/8-8-8.bmp");
+
+            const char* testFilename = "test_files/test_writting_bytes";
+            for (size_t i = 0; i < files.size(); ++i) {
+                stringstream ss;
+                ss << "writeBytesToFileTest() with file " << files[i] << " is failed";
+                string errorMessage = ss.str();
+
+                ss.str(string());
+                ss << "writeBytesToFileTest() with file " << files[i] << " is passed";
+                string okMessage = ss.str();
+
+                bytes data = readBytesFromFile(files[i]);
+                writeBytesToFile(testFilename, data);
+                bytes result = readBytesFromFile(testFilename);
+
+                if (checkEqual(data, result, errorMessage)) {
+                    log(okMessage);
+                }
+            }
         }
 };
 
@@ -167,8 +285,11 @@ int main() {
     NTest::TestEnvironment::addTest(new ToHexTest);
     NTest::TestEnvironment::addTest(new DumpToHexTest);
     NTest::TestEnvironment::addTest(new ReadBytesFromFileTest);
-    NTest::TestEnvironment::addTest(new BMPImageTest);
     NTest::TestEnvironment::addTest(new UintFromBytesTest);
+    NTest::TestEnvironment::addTest(new BytesFromUintTest);
+    NTest::TestEnvironment::addTest(new WriteBytesToFileTest);
+    NTest::TestEnvironment::addTest(new BMPImageTest);
+    NTest::TestEnvironment::addTest(new LSBEncoderTest);
 
     NTest::TestEnvironment::run();
 

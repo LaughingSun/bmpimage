@@ -56,38 +56,66 @@ namespace NTest {
         return condition;
     }
 
+    template<typename T>
+    void out(ostream& stream, const T& val) {
+        stream << val;
+    }
+
+    void out(ostream& stream, unsigned char val) {
+        stream << (int) val;
+    }
+    
+    template<typename T>
+    void out(ostream& stream, const vector<T>& val) {
+        stream << "vector(" << val.size() << "){";
+        for (size_t i = 0; i < val.size(); ++i) {
+            if (i != 0) {
+                stream << "; ";
+            }
+            out(stream, val[i]); 
+        }
+        stream << "}";
+    }
+
+
     template<typename T, typename W>
     string getInequalityMessage(const T& a, const W& b) {
         stringstream ss;
-        ss << a << " != " << b;
+        out(ss, a);
+        ss << " != ";
+        out(ss, b);
         return ss.str();
     }
 
     template<typename T>
-    void checkEqual(const T& a, const T& b, const string& message) {
+    bool checkEqual(const T& a, const T& b, const string& message) {
         if (!checkTrue(a == b, message)) {
             error(getInequalityMessage(a, b));
+            return false;
         }
+        return true;
     }
 
     template<typename T>
-    void checkEqual(const T& a, const T& b) {
+    bool checkEqual(const T& a, const T& b) {
         if (!checkTrue(a == b)) {
             error(getInequalityMessage(a, b));
+            return false;
         }
+        return true;
     }
 
-    void checkEqual(const string& a, const char* b) {
-        checkEqual(a, string(b));
+    bool checkEqual(const string& a, const char* b) {
+        return checkEqual(a, string(b));
     }
-    void checkEqual(const char* a, const string& b) {
-        checkEqual(string(a), b);
+    bool checkEqual(const char* a, const string& b) {
+        return checkEqual(string(a), b);
     }
-    void checkEqual(const string& a, const char* b, const string& message) {
-        checkEqual(a, string(b), message);
+    bool checkEqual(const string& a, const char* b, const string& message) {
+        return checkEqual(a, string(b), message);
     }
-    void checkEqual(const char* a, const string& b, const string& message) {
-        checkEqual(string(a), b, message);
+    bool checkEqual(const char* a, const string& b, const string& message) {
+        return checkEqual(string(a), b, message);
     }
 
     class Test {
