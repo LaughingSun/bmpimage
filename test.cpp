@@ -199,6 +199,10 @@ class LSBEncoderTest: public NTest::Test {
             messageLengths.push_back(12);
             message.push_back("10110111");
 
+            files.push_back("test_files/forLSB.bmp");
+            messageLengths.push_back(300);
+            message.push_back("1010011111");
+
             for (size_t i = 0; i < files.size(); ++i) {
                 string encodedFile = files[i] + "_encoded.bmp";
                 NImage::LSBEncoder encoder(files[i]);
@@ -257,6 +261,7 @@ class WriteBytesToFileTest: public NTest::Test {
             files.push_back("test_files/read_bytes.txt");
             files.push_back("test_files/X8-8-8-8.bmp");
             files.push_back("test_files/8-8-8.bmp");
+            files.push_back("test_files/forLSB.bmp");
 
             const char* testFilename = "test_files/test_writting_bytes";
             for (size_t i = 0; i < files.size(); ++i) {
