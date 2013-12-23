@@ -8,6 +8,10 @@ debug_test: bmpimage.h test.h test.cpp
 	g++ -g test.cpp -o test
 	gdb test
 
+block: block.h block.cpp block_decoder.cpp block_decoder.h
+	g++ -O2 block.cpp -o binaries/block_encoder
+	g++ -O2 block_decoder.cpp -o binaries/block_decoder
+
 pseudo: pseudo.h pseudo.cpp pseudo_decoder.cpp pseudo_decoder.h
 	g++ -O2 pseudo.cpp -o binaries/pseudo_encoder
 	g++ -O2 pseudo_decoder.cpp -o binaries/pseudo_decoder
